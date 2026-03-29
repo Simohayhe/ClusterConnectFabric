@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "clusterconnect_fabric",
+  "version": "${version}",
+  "name": "ClusterConnect Fabric",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/clusterconnect_fabric/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "net.simohaya.clusterconnect_fabric.Clusterconnect_fabric"
+    ]
+  },
+  "mixins": [
+    "clusterconnect_fabric.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
