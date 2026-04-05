@@ -50,7 +50,9 @@ public class Clusterconnect_fabric implements ModInitializer {
                     GameProfile profile = new GameProfile(data.uuid, data.username);
                     profile.getProperties().putAll(data.properties);
 
-                    ((ServerLoginNetworkHandlerAccessor) loginHandler).callStartVerify(profile);
+                    ServerLoginNetworkHandlerAccessor accessor = (ServerLoginNetworkHandlerAccessor) loginHandler;
+                    accessor.setProfile(profile);
+                    accessor.callAcceptPlayer();
 
                     LOGGER.info("[ClusterConnect] Accepted forwarded profile: {} ({})",
                         profile.getName(), profile.getId());
