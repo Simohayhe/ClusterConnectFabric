@@ -9,4 +9,4 @@ pluginManagement {
 }
 
 rootProject.name = 'clusterconnect-fabric'
-include 'mc1_20', 'mc1_21'
+include 'mc1_20', 'mc1_21', 'mc26_1'
