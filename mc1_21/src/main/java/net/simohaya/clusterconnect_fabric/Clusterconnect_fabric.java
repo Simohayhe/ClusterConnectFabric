@@ -20,25 +20,10 @@ public class Clusterconnect_fabric implements ModInitializer {
     public void onInitialize() {
         ClusterConnectConfig.load();
 
-        // Register the Velocity Modern Forwarding receiver.
-        //
-        // When a player connects through Velocity, the mixin in
-        // ServerLoginNetworkHandlerMixin sends a plugin-channel query on
-        // velocity:player_info and cancels the normal offline-mode login flow.
-        //
-        // Velocity responds with a signed payload containing the player's real
-        // UUID, username, and skin properties (textures). Fabric API intercepts
-        // the raw bytes *before* vanilla would discard them, then calls this
-        // handler.
-        //
-        // We verify the HMAC-SHA256 signature and call startVerify() with the
-        // fully-populated GameProfile (including textures), which lets the normal
-        // tick loop proceed to WAITING_FOR_DUPE_DISCONNECT → sendSuccessPacket.
         ServerLoginNetworking.registerGlobalReceiver(VELOCITY_CHANNEL,
             (server, loginHandler, responded, buf, synchronizer, responseSender) -> {
 
                 if (!responded) {
-                    // Vanilla client / direct connection — no forwarding data.
                     loginHandler.disconnect(
                         net.minecraft.text.Text.literal(
                             "This server is behind a Velocity proxy. Direct connections are not allowed."
@@ -58,11 +43,12 @@ public class Clusterconnect_fabric implements ModInitializer {
                 }
 
                 try {
-                    GameProfile profile = VelocityForwardingHandler.verifyAndExtract(buf, secretKey);
+                    PlayerData data = VelocityForwardingHandler.verifyAndExtract(buf, secretKey);
 
-                    // Advance the login state machine with the real profile.
-                    // startVerify() sets this.profile and state = VERIFYING, after
-                    // which tick() calls tickVerify() → sendSuccessPacket().
+                    // 1.21.x authlib: GameProfile uses record-style accessors (name(), id(), properties())
+                    GameProfile profile = new GameProfile(data.uuid, data.username);
+                    profile.properties().putAll(data.properties);
+
                     ((ServerLoginNetworkHandlerAccessor) loginHandler).callStartVerify(profile);
 
                     LOGGER.info("[ClusterConnect] Accepted forwarded profile: {} ({})",

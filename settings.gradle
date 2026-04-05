@@ -7,3 +7,6 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+rootProject.name = 'clusterconnect-fabric'
+include 'mc1_20', 'mc1_21'
