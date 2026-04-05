@@ -1,6 +1,7 @@
 package net.simohaya.clusterconnect_fabric;
 
 import com.mojang.authlib.GameProfile;
+import com.mojang.authlib.properties.PropertyMap;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.ServerLoginNetworking;
 import net.minecraft.util.Identifier;
@@ -45,9 +46,9 @@ public class Clusterconnect_fabric implements ModInitializer {
                 try {
                     PlayerData data = VelocityForwardingHandler.verifyAndExtract(buf, secretKey);
 
-                    // 1.21.x authlib: GameProfile uses record-style accessors (name(), id(), properties())
-                    GameProfile profile = new GameProfile(data.uuid, data.username);
-                    profile.properties().putAll(data.properties);
+                    // 1.21.x authlib 7.x: PropertyMap wraps ImmutableMultimap — putAll() throws.
+                    // Use the 3-arg record constructor: GameProfile(UUID, String, PropertyMap).
+                    GameProfile profile = new GameProfile(data.uuid, data.username, new PropertyMap(data.properties));
 
                     ((ServerLoginNetworkHandlerAccessor) loginHandler).callStartVerify(profile);
 
